@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get the version number
+        run: echo "VERNUM=$(awk -F'\"' '/version_number/ { print $4 }' manifest.json)" >> $GITHUB_ENV
+
+      - name: Set the filename
+        run: echo "FILENAME=$( echo ${{ github.repository }} | awk -F'/' '{ print $2}')-${{ env.VERNUM }}" >> $GITHUB_ENV
+
+      - name: Upload artifact as release asset
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.FILENAME }}
+          path: .
